@@ -4,29 +4,35 @@ services:
   api:
     build: ./api
     ports:
-      - 3001:3001
+      - 3000:3000
     volumes:
       - ./api:/usr/src/app
     environment:
       - NODE_ENV=development
-      - PORT=3001
+      - PORT=3000
+      # - DatabaseUrl=mongodb://mongo:27017/yummyyams
     depends_on:
       - mongo
-
-  app:
-    build: ./app
-    ports:
-      - 3000:3000
-    volumes:
-      - ./app:/usr/src/app
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - api
+    networks:
+      - my-networks
 
   mongo:
     image: mongo:latest
+    command: ["mongod", "--auth"]
     ports:
-      - 27017:27017
+      - 27018:27017
     volumes:
-      - ./data:/data/db
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rootuser
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
+    networks:
+      - my-networks
+
+networks:
+  my-networks:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
