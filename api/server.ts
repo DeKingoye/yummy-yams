@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 3000;
 // Middleware pour lire le JSON
 app.use(express.json());
 app.use(cors());
-app.use('/api', authroutes);
-app.use('/api', gameroutes);
+app.use('/api/auth', authroutes);
+app.use('/api/game', gameroutes);
 
 // Route de base
 app.get('/', (req: Request, res: Response) => {
