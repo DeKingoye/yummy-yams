@@ -3,7 +3,9 @@ import {String } from '../../../modules/Utils';
 import { login , LoginParams } from '../../../network/endpoints/authentification';
 import { useContext, useState } from 'react';
 import { SessionContext } from '../../../hooks/context/SessionContext';
-
+import { RouterName } from '../../../core/AppRoutes/RouterNames';
+import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 interface ErrorLogin {
   email: string;
@@ -100,8 +102,10 @@ const Login = () => {
               Submit
             </button>
           </form>
+          
         )}
       </Formik>
+      <p>Vous n'avez pas de compte ? <NavLink to={RouterName.SIGNUP.path}>Inscrivez-vous</NavLink></p>
     </div>
   );
 

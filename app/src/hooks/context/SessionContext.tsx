@@ -3,6 +3,9 @@ import { SessionCookie } from '../../modules/session';
 import type { PropsWithChildren } from 'react';
 import { RouterName } from '../../core/AppRoutes/RouterNames';
 import { useNavigate } from 'react-router-dom';
+import { getMe } from '../../network/endpoints/authentification';
+import { User } from '../../normalizr/user/user';
+
 
 type SessionState =  string | null;
 
@@ -12,12 +15,14 @@ type SessionContextProps = {
   logout: ()=> void;
   hasSessionUser: ()=> void;
   hasNotSessionUser: ()=> void;
+  me: User | null;
 }
 
 export const SessionContext = createContext<SessionContextProps | null>(null);
 
 const SessionProvider = ({ children }: PropsWithChildren) => {
   const [session, setSession] = useState<SessionState>(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,13 +41,16 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
     setSession( SessionCookie.get());
 
     navigate(RouterName.LOGIN.path);
+    
   };
 
   const login = (token: string): void => {
     SessionCookie.set(token);
     setSession(SessionCookie.get());
 
-    navigate('/');
+    getMe().then((response) => {
+      setUser(response);
+    }).finally(() => navigate('/'));
   };
 
   const hasSessionUser=():void=>{
@@ -53,7 +61,7 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
   }
 
   const hasNotSessionUser=():void=>{
-    if(!!session){
+    if(session){
         return
     }
     logout();
@@ -61,7 +69,7 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <SessionContext.Provider
-      value={{ session, login, logout, hasNotSessionUser, hasSessionUser }}
+      value={{ session,me:user, login, logout, hasNotSessionUser, hasSessionUser }}
     >
       {children}
     </SessionContext.Provider>

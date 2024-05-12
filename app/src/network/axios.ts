@@ -7,6 +7,9 @@ import axios, {
   } from 'axios';
   import { Logger } from '../modules/Logger';
   import { NetworkError } from '../modules/Errors';
+import { SessionCookie } from '../modules/session';
+
+
   
   const parameters = {
     headers: {
@@ -27,6 +30,10 @@ import axios, {
   };
   const onReqSuccess = () => (config: AxiosRequestConfig) => {
     Logger.info('Axios interceptor: request configuration', config);
+    const token = SessionCookie.get();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   };
   const onRespSuccess = () => (response: AxiosResponse) => {

@@ -1,35 +1,31 @@
 import express from 'express';
-import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import authRoutes from './routes/authRoutes';
+import gameRoutes from './routes/gameRoutes';
+import pastriesRoutes from './routes/pastryRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import authroutes from './src/routes/auth.routes';
-import gameroutes from './src/routes/game.routes'
-
-// Charger les variables d'environnement
-dotenv.config();
+import { Request, Response } from 'express';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware pour lire le JSON
-app.use(express.json());
+dotenv.config();
+
 app.use(cors());
-app.use('/api/auth', authroutes);
-app.use('/api/game', gameroutes);
+app.use(express.json());
 
-// Route de base
+app.use('/api/auth', authRoutes);
+app.use('/api/game', gameRoutes);
+app.use('/api/pastry', pastriesRoutes);
+
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
-});
+    res.send('Hello, World!');
+  });
 
-
-mongoose.connect(process.env.DatabaseUrl as string)
-
-console.log('connection à la base de données réussie')
-
-// Écouter sur le port spécifié
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running at http://localhost:${PORT}`);
 });
-
+mongoose.connect(process.env.DatabaseUrl as string)
+    .then(() => console.log('Connexion à MongoDB réussie !'))
+    .catch(() => console.log('Connexion à MongoDB échouée !'));
