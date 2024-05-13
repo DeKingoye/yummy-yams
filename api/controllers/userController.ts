@@ -1,6 +1,6 @@
 import User, { IUser } from '../models/userModel';
 import { JwtFactoryUtils } from '../Utils/jwt.utils';
-import { CustomRequest, CustomResponse } from '../Type';
+import { CustomRequest, CustomResponse } from '../type';
 
 // Inscription
 export const signUp = async (req: CustomRequest, res: CustomResponse) => {
@@ -46,3 +46,15 @@ export const me = async (req: CustomRequest, res: CustomResponse) => {
     res.status(500).json({ message: "Erreur lors de la récupération de l'utilisateur" });
     };
   }
+
+// Update
+export const update = async (req: CustomRequest, res: CustomResponse) => {
+  try {
+    const id = req.user?.id;
+    const user = await  User.findByIdAndUpdate(id, req.body , {new: true}).exec(); 
+    res.status(200).json(user);
+  }
+  catch (error) {
+    res.status(500).json({ message: "Erreur lors de la mise à jour de l'utilisateur" });
+  }
+}
