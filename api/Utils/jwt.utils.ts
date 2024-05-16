@@ -4,7 +4,7 @@ const SECRET_KEY = 'votre_secret_ici';
 
 export class JwtFactoryUtils {
     static generateToken(payload: {id:string}): string {
-        return jwt.sign(payload, SECRET_KEY, { expiresIn: '24h' });
+        return jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
     }
     static parseAutorizationHeader(header: string | null): string | null{
        return header !== null ? header.replace('Bearer ', '') : null;

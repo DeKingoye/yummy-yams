@@ -6,7 +6,7 @@ function Error404() {
   return (
     <div>
       <h1>page not found</h1>
-      <Link to={RouterName.HOME.path}> Retour à l'acceuil </Link>
+      <Link to={RouterName.HOME.path}> Retour à l'accueuil </Link>
     </div>
   );
 }
