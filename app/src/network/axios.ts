@@ -3,11 +3,12 @@ import axios, {
     Axios,
     AxiosError,
     AxiosResponse,
-    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
   } from 'axios';
   import { Logger } from '../modules/Logger';
   import { NetworkError } from '../modules/Errors';
 import { SessionCookie } from '../modules/session';
+// import { RouterName } from '../core/AppRoutes/RouterNames';
 
   
   const parameters = {
@@ -22,19 +23,29 @@ import { SessionCookie } from '../modules/session';
   
     throw err;
   };
-  const onRespError = () => (err: Error | AxiosError) => {
+  const onRespError = () => (err: Error | AxiosError ) => {
     Logger.warn('Axios interceptor: response failure', err);
-    if (err.response?.status===401){
-      SessionCookie.destroy();
-      alert('session expirée, veuillez-vous reconnecter');
-      window.location.href='/'
+    if (axios.isAxiosError(err) && err.response) {
+      if (err.response?.status===401){
+        SessionCookie.destroy();
+        //alert('session expirée, veuillez-vous reconnecter');
+        //window.location.href= RouterName.LOGIN.path;
+      }
+
+      const message = err.response?.data ?? err.message;
+      throw new NetworkError(err, message);
+
+    }else{
+      throw new NetworkError(err, err.message);
     }
   
-    const message = err.response?.data ?? err.message;
-    throw new NetworkError(err, message);
+    
   };
-  const onReqSuccess = () => (config: AxiosRequestConfig) => {
+  const onReqSuccess = () => (config: InternalAxiosRequestConfig) => {
     Logger.info('Axios interceptor: request configuration', config);
+
+    config.headers = config.headers ?? {};
+
     const token = SessionCookie.get();
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -59,7 +70,7 @@ import { SessionCookie } from '../modules/session';
   const apisFactory = () => ({
     yummy: middleware(
       axios.create({
-        baseURL: import.meta.env.VITE_YUMMY_API,
+        baseURL: import.meta.env.VITE_YUMMY_API+'/api',
         ...parameters,
         timeout: 60000,
       })
